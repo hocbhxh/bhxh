@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BHXH Tự Nguyện 2026</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0072bc">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container" id="capture-area">
+    <div class="header">
+        <div class="header-left" onclick="window.location.reload()" style="cursor: pointer;">
+            <div class="logo">
+                <img src="#" alt="Logo BHXH" crossorigin="anonymous">
+            </div>
+            <div class="title">
+                <h1>BHXH Tự Nguyện</h1>
+                <p>Tra cứu - Tính toán - Thanh toán 2026</p>
+            </div>
+        </div>
+        <div class="btn-settings" id="btn-open-settings"><i class="fas fa-cog"></i></div>
+    </div>
+
+    <div id="settings-modal" class="modal" data-html2canvas-ignore="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-sliders-h"></i> CẤU HÌNH HỆ THỐNG</div>
+                <div class="modal-close-icon" id="btn-close-settings-icon"><i class="fas fa-times"></i></div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="settings-group">
+                    <div class="group-title"><i class="fas fa-university"></i> Thông tin nhận thanh toán (VietQR)</div>
+                    <div class="input-wrapper">
+                        <label class="input-label">Ngân hàng:</label>
+                        <select id="bank-code" class="custom-select">
+                            <option value="970422">MB Bank</option>
+                            <option value="970436">Vietcombank</option>
+                            <option value="970415">VietinBank</option>
+                            <option value="970405">Agribank</option>
+                            <option value="970418">BIDV</option>
+                            <option value="970403">Sacombank</option>
+                            <option value="970407">Techcombank</option>
+                            <option value="970423">TPBank</option>
+                        </select>
+                    </div>
+                    <div class="grid-2">
+                        <div class="input-wrapper">
+                            <label class="input-label">Số tài khoản:</label>
+                            <input type="text" id="bank-acc" class="custom-input" placeholder="Nhập STK...">
+                        </div>
+                        <div class="input-wrapper">
+                            <label class="input-label">Tên chủ TK (Không dấu):</label>
+                            <input type="text" id="bank-name" class="custom-input" placeholder="PHAM VAN HOC">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="group-title"><i class="fas fa-chart-line"></i> Tham số tính toán</div>
+                    <div class="grid-2">
+                        <div class="input-wrapper">
+                            <label class="input-label">Hệ số trượt giá (CPI):</label>
+                            <input type="number" id="inflation-rate" class="custom-input" value="1.5055" step="0.0001">
+                        </div>
+                        <div class="input-wrapper">
+                            <label class="input-label">Lãi suất đầu tư (%/tháng):</label>
+                            <input type="number" id="interest-rate" class="custom-input" value="0.31" step="0.001">
+                        </div>
+                    </div>
+                    <div class="input-wrapper">
+                        <label class="input-label">Lương Cơ Sở (VNĐ):</label>
+                        <input type="number" id="base-salary" class="custom-input" value="2340000">
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="group-title"><i class="fas fa-cogs"></i> Cấu hình gói đóng nhiều năm</div>
+                    <div class="grid-2">
+                        <div class="input-wrapper">
+                            <label class="input-label">Số tháng gói 5 Năm:</label>
+                            <input type="number" id="cfg-months-5y" class="custom-input" value="60">
+                        </div>
+                        <div class="input-wrapper">
+                            <label class="input-label">Số tháng gói 10 Năm:</label>
+                            <input type="number" id="cfg-months-10y" class="custom-input" value="120">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-main btn-secondary" id="btn-close-settings">Hủy bỏ</button>
+                <button class="btn-main btn-save" id="btn-save-settings">Lưu & Áp dụng</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs" data-html2canvas-ignore="true">
+        <button class="tab-btn active" data-tab="forward">TÍNH MỨC ĐÓNG</button>
+        <button class="tab-btn" data-tab="reverse">TÍNH MỤC TIÊU</button>
+    </div>
+
+    <div class="content-body">
+        <div class="consultant-box">
+            <div class="c-row"><span>Tư vấn viên:</span> <span id="consultant-name" class="editable" contenteditable="true">Phạm Văn Học</span></div>
+            <div class="c-row"><span>Điện thoại:</span> <span id="consultant-phone" class="editable" contenteditable="true">0983774078</span></div>
+            <div class="c-row"><span>Khách hàng:</span> <span id="customer-name" class="editable" contenteditable="true" style="color:var(--primary)">Họ và tên ...</span></div>
+        </div>
+
+        <div id="tab-forward" class="tab-pane active">
+            <div class="main-form-group">
+                <label class="main-label">1. Mức thu nhập lựa chọn (VNĐ)</label>
+                <select id="income" class="custom-select"><option>Đang tải dữ liệu...</option></select>
+            </div>
+
+            <div class="main-form-group">
+                <label class="main-label">2. Mức hỗ trợ từ Ngân sách</label>
+                <div class="grid-2">
+                    <select id="supportState" class="custom-select">
+                        <option value="10">NSNN: 10% </option>
+                        <option value="20" selected>NSNN: 20% (Khác)</option>
+                        <option value="25">NSNN: 25% </option>
+                        <option value="30">NSNN: 30% (DTTS)</option>
+                        <option value="40">NSNN: 40% (Cận nghèo)</option>
+                        <option value="50">NSNN: 50% (Hộ nghèo)</option>
+                    </select>
+                    <select id="supportLocal" class="custom-select">
+                        <option value="0">Địa phương: 0%</option>
+                        <option value="5">Địa phương: 5%</option>
+                        <option value="10">Địa phương: 10%</option>
+                        <option value="15">Địa phương: 15%</option>
+                        <option value="20">Địa phương: 20%</option>
+                        <option value="30">Địa phương: 30%</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="main-form-group">
+                <label class="main-label">3. Phương thức đóng</label>
+                <select id="method" class="custom-select">
+                    <option value="1">Hàng tháng</option>
+                    <option value="3">3 tháng / lần</option>
+                    <option value="6">6 tháng / lần</option>
+                    <option value="12">12 tháng / lần</option>
+                    <option value="opt_5y">5 năm (Lãi suất PV giảm trừ )</option>
+                    <option value="opt_10y">10 năm (Lãi suất FV cộng thêm)</option>
+                </select>
+            </div>
+
+            <button class="btn-main" id="btn-calc-forward">TÍNH BHXHTN</button>
+        </div>
+
+        <div id="tab-reverse" class="tab-pane">
+            <div class="reverse-wrapper">
+                <label style="color:#e65100; font-weight:700;">Bạn muốn nhận lương hưu bao nhiêu?</label>
+                <input type="text" id="target-pension" class="big-input" placeholder="3.000.000">
+                <div style="font-size:13px; color:var(--text-sub); margin-bottom:15px;">(VNĐ/tháng - Dự kiến sau 20 năm)</div>
+                
+                <div class="gender-group">
+                    <label class="gender-label"><input type="radio" name="gender" value="male" checked> Nam</label>
+                    <label class="gender-label"><input type="radio" name="gender" value="female"> Nữ</label>
+                </div>
+                
+                <button class="btn-main btn-orange" id="btn-calc-reverse">
+                    TÌM MỨC ĐÓNG PHÙ HỢP
+                </button>
+            </div>
+        </div>
+
+        <div id="result-section" class="result-section">
+            <div class="result-header">BẢNG KÊ CHI TIẾT</div>
+            
+            <div id="notification-area" class="notification-area"></div>
+
+            <div class="result-row"><span>Mức đóng BHXH (22%)</span> <span id="res-monthly" class="result-val">0 đ</span></div>
+            <div class="result-row"><span>NS Nhà nước hỗ trợ</span> <span id="res-support-state" class="result-val val-green">-0 đ</span></div>
+            <div class="result-row"><span>NS Địa phương hỗ trợ</span> <span id="res-support-local" class="result-val val-green">-0 đ</span></div>
+            <div class="result-row" id="row-interest" style="display:none"><span>Điều chỉnh lãi suất</span> <span id="res-interest" class="result-val">0 đ</span></div>
+            
+            <div class="total-box">
+                <span class="total-label">SỐ TIỀN THỰC ĐÓNG:</span>
+                <span class="total-value" id="res-total">0 đ</span>
+            </div>
+
+            <div id="comparison-box" class="notification-area" style="margin-top:15px; background:#e8f5e9; color:#2e7d32; border-color:#c8e6c9;"></div>
+
+            <div class="info-card">
+                <div class="card-header"><i class="fas fa-gift"></i> Quyền lợi khi nghỉ hưu</div>
+                <div class="card-body">
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-piggy-bank"></i></div>
+                        <div><strong>Lương hưu:</strong> Khoảng <span id="ben-pension" style="color:var(--primary); font-weight:700">0 đ</span>/tháng (Nam) - <span id="ben-pension-female" style="color:var(--primary); font-weight:700">0 đ</span>/tháng (Nữ)</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-chart-line"></i></div>
+                        <div><strong>Điều chỉnh trượt giá:</strong> Lương hưu được nhà nước điều chỉnh tăng theo chỉ số giá tiêu dùng (CPI) để đảm bảo cuộc sống.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-heartbeat"></i></div>
+                        <div><strong>Thẻ BHYT miễn phí:</strong> Được cấp thẻ BHYT với mức hưởng 95% chi phí khám chữa bệnh trong suốt thời gian hưởng lương hưu.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-user-shield"></i></div>
+                        <div><strong>Mai táng phí:</strong> Người lo mai táng nhận 10 lần lương cơ sở. Mức hiện tại: (<span id="ben-funeral" class="val-red">23.400.000 đ</span>) + Thân nhân hưởng trợ cấp tuất 1 lần.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="schedule-box" class="info-card" style="display:none; border-color:#b9f6ca;">
+                <div class="card-header" style="background:#e8f5e9; color:#1b5e20;"><i class="fas fa-calendar-alt"></i> Lịch đóng tiếp theo</div>
+                <div class="card-body">
+                    <ul id="schedule-list" style="margin:0; padding-left:20px; color:#065f46"></ul>
+                </div>
+            </div>
+
+            <label class="payment-toggle" data-html2canvas-ignore="true">
+                <input type="checkbox" id="chk-payment">
+                <span style="color:#f57c00; font-weight:700;">Hiện mã QR chuyển khoản ngay</span>
+            </label>
+
+            <div id="qr-display" class="qr-area" data-html2canvas-ignore="true">
+                <p style="margin:0 0 10px 0; font-weight:700; color:var(--primary);">QUÉT MÃ VIETQR</p>
+                <img id="qr-img" src="" alt="QR">
+                <div id="bank-info" class="bank-info-text"></div>
+            </div>
+
+            <div class="actions" data-html2canvas-ignore="true">
+                <button class="btn-outline btn-zalo" id="btn-zalo"><i class="far fa-copy"></i> Sao chép Zalo</button>
+                <button class="btn-outline btn-pdf" id="btn-export"><i class="fas fa-file-pdf"></i> Xuất PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div style="font-weight:700; margin-bottom:15px; color:#444; border-left:4px solid var(--primary); padding-left:10px;">
+        CÂU HỎI THƯỜNG GẶP
+    </div>
+    <div class="faq-box">
+        <div class="faq-item">
+            <div class="faq-q">1. Đóng bao lâu có lương hưu? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-a">Cần tham gia BHXH tối thiểu 15 năm và đủ tuổi nghỉ hưu theo quy định.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">2. Quyền lợi khi qua đời? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-a">Người lo mai táng nhận 10 lần lương cơ sở (khi đóng BHXH tự nguyện từ đủ 5 năm). Thân nhân hưởng trợ cấp tuất một lần.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">3. Có được rút 1 lần không? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-a">Được, sau 1 năm dừng đóng. Nhưng mức hưởng thấp hơn nhiều so với lương hưu, rất thiệt thòi.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">4. Có được hưởng thai sản không? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-a">Được, Lao động nữ sinh con hoặc Lao động nam có vợ sinh con đóng từ đủ 6 tháng trong vòng 12 trước khi sinh. Mức hưởng 2 triệu đồng/con.</div>
+        </div>
+    </div>
+    <a href="#" id="btn-install-guide" style="display:block; text-align:center; padding:10px; color:#999; font-size:12px; margin-top:15px; text-decoration:none;">
+        <i class="fas fa-mobile-alt"></i> Hướng dẫn cài đặt App về máy
+    </a>
+    <div class="copyright">© 2025 Hỗ trợ đại lý thu BHXH</div>
+</div>
+
+<div id="pdf-export-template" style="position:fixed; top:-9999px; left:-9999px; width: 800px; background: #fff; padding: 40px; font-family: 'Times New Roman', serif; color: #000; z-index: -1; line-height: 1.6;">
+    <div style="font-size: 26px; font-weight: bold; margin-bottom: 25px; color: #000; display: flex; align-items: center;">
+        <span style="margin-right: 10px;">📋</span> <span style="font-style: italic;">BHXH TỰ NGUYỆN</span>
+    </div>
+
+    <div style="font-size: 18px;">
+        <div style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+            <span style="width: 30px;">👤</span> 
+            <span style="font-weight: normal; width: 260px;">Người tham gia:</span> 
+            <span id="pdf-name" style="font-weight: bold;">...</span>
+        </div>
+
+        <div style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+            <span style="width: 30px;">💰</span> 
+            <span style="font-weight: normal; width: 260px;">Thu nhập làm căn cứ đóng:</span> 
+            <span id="pdf-income" style="font-weight: bold;">...</span>
+        </div>
+
+        <div style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+            <span style="width: 30px;">📅</span> 
+            <span style="font-weight: normal; width: 260px;">Phương thức đóng:</span> 
+            <span id="pdf-method" style="font-weight: bold;">...</span>
+        </div>
+
+        <div style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+            <span style="width: 30px;">👉</span> 
+            <span style="font-weight: normal; width: 260px;">Mức đóng BHXH (22%):</span> 
+            <span id="pdf-monthly" style="font-weight: bold;">...</span>
+        </div>
+
+        <div style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+            <span style="width: 30px;">👉</span> 
+            <span style="font-weight: normal; width: 260px;">NS Nhà nước hỗ trợ:</span> 
+            <span id="pdf-support-state" style="font-weight: bold;">...</span>
+        </div>
+
+        <div style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+            <span style="width: 30px;">👉</span> 
+            <span style="font-weight: normal; width: 260px;">NS Địa phương hỗ trợ:</span> 
+            <span id="pdf-support-local" style="font-weight: bold;">...</span>
+        </div>
+
+        <div style="margin-bottom: 20px; display: flex; align-items: flex-start; font-size: 19px; margin-top: 15px;">
+            <span style="width: 30px;">💰</span> 
+            <span style="font-weight: bold; width: 260px; font-style: italic;">*SỐ TIỀN THỰC ĐÓNG:</span> 
+            <span id="pdf-total" style="font-weight: bold; color: #000; background-color: yellow;">...</span>
+        </div>
+
+        <div style="margin-bottom: 5px; display: flex; align-items: flex-start;">
+            <span style="width: 30px;">📅</span> 
+            <span style="font-weight: normal;">Lịch đóng tiếp theo:</span>
+        </div>
+        
+        <div id="pdf-schedule-container" style="margin-left: 30px; margin-bottom: 25px;">
+            </div>
+
+        <div style="margin-top: 40px; padding-top: 10px; display: flex; align-items: center;">
+            <span style="width: 30px;">📞</span> 
+            <span style="font-weight: normal; margin-right: 5px;">Tư vấn:</span> 
+            <span id="pdf-consultant" style="font-weight: bold;">...</span>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
