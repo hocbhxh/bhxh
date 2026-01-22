@@ -332,8 +332,8 @@
                 // Tính quyền lợi hưởng (Lương hưu, Mai táng phí)
                 // Công thức ước tính đơn giản: Lương hưu = Thu nhập * Hệ số trượt giá * Tỷ lệ hưởng (45% - 75%)
                 let pensionBase = income * inflationRate;
-                let pensionAmtMale = pensionBase * 0.45;   // Nam khởi điểm 45%
-                let pensionAmtFemale = pensionBase * 0.55; // Nữ khởi điểm ước tính cao hơn do lộ trình
+                let pensionAmtMale = pensionBase * 0.40;   // Nam đóng 15 năm khởi điểm 40%
+                let pensionAmtFemale = pensionBase * 0.45; // Nữ khởi điểm ước tính cao hơn do lộ trình
                 // Lưu ý: Đây là con số ước tính để tham khảo, thực tế phụ thuộc nhiều yếu tố.
 
                 document.getElementById('ben-pension').innerText = "~" + Utils.formatCurrency(pensionAmtMale);
@@ -353,8 +353,8 @@
                 if (!target || target < 500000) { alert("Vui lòng nhập mức lương hưu hợp lý!"); return; }
 
                 let gender = document.querySelector('input[name="gender"]:checked').value;
-                let inflation = parseFloat(document.getElementById('inflation-rate').value) || 1.5055;
-                let rate = gender === 'male' ? 0.45 : 0.55;
+                let inflation = parseFloat(document.getElementById('inflation-rate').value) || 1.3;
+                let rate = gender === 'male' ? 0.40 : 0.45;
 
                 // Công thức ngược: Thu nhập cần = Lương hưu / (Hệ số trượt giá * Tỷ lệ hưởng)
                 let requiredIncome = target / (inflation * rate);
@@ -552,3 +552,4 @@
 
     // Chạy ứng dụng khi trình duyệt tải xong HTML
     document.addEventListener('DOMContentLoaded', () => { App.init(); });
+
