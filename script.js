@@ -42,6 +42,7 @@
             this.bindEvents();      // Gắn sự kiện click, change cho các nút bấm
             this.initIncomeOptions(); // Tạo danh sách chọn mức thu nhập
             this.Settings.load();   // Tải cấu hình đã lưu từ lần trước
+            this.Stats.init(); // Gọi hàm đếm số lượt truy cập khi khởi chạy
         },
 
         // Lưu các phần tử HTML vào bộ nhớ
@@ -548,8 +549,36 @@
                 }
             }
         }
-    };
+
+        /* ... (Phần Export ở trên giữ nguyên) ... */
+    
+        /* --- THỐNG KÊ TRUY CẬP (STATS) --- */
+        Stats: {
+            update: function() {
+                const countEl = document.getElementById('visitor-count');
+                if(!countEl) return;
+    
+                // Sử dụng API miễn phí countapi.xyz
+                // Namespace: bhxh-tool-2026 (Bạn có thể đổi tên này thành tên riêng để không trùng với người khác)
+                // Key: visits
+                const namespace = 'bhxh-tool-2026-v1'; 
+                const key = 'visits';
+    
+                fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        // Hiển thị số và định dạng có dấu chấm (ví dụ: 1.234)
+                        countEl.innerText = Utils.formatNumber(data.value);
+                    })
+                    .catch(err => {
+                        console.error("Lỗi đếm truy cập:", err);
+                        countEl.innerText = "Error";
+                    });
+            }
+        }
+    }; // <-- Dấu đóng ngoặc kết thúc App
 
     // Chạy ứng dụng khi trình duyệt tải xong HTML
     document.addEventListener('DOMContentLoaded', () => { App.init(); });
+
 
